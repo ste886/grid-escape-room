@@ -65,26 +65,33 @@ public class Grid implements GridOperation {
 
   public boolean isMoving() {
     Random random = new Random();
-    int direction = random.nextInt(1);
+    int direction = random.nextInt(4);
+    int newPosition;
     switch (direction) {
       case 0:
-        player.setX(player.getX() + 1);
-        return amIWinning();
-        // non posso andare sopra ad un blocco, rifare il movimento
+        newPosition = player.getX() + 1;
+        if (isPositionAllowed(newPosition) && !isCollision(newPosition, player.getY())) {
+          player.setX(newPosition);
+          return amIWinning();
+        }
+        return false;
       case 1:
-        player.setY(player.getY() - 1);
-        // non posso uscire dal perimetro della griglia, rifare il movimento
-        // non posso andare sopra ad un blocco, rifare il movimento
+        newPosition = player.getY() - 1;
+        if (isPositionAllowed(newPosition) && !isCollision(player.getX(), newPosition)) {
+          player.setY(newPosition);
+        }
         return false;
       case 2:
-        player.setX(player.getX() - 1);
-        // non posso uscire dal perimetro della griglia, rifare il movimento
-        // non posso andare sopra ad un blocco, rifare il movimento
+        newPosition = player.getX() - 1;
+        if (isPositionAllowed(newPosition) && !isCollision(newPosition, player.getY())) {
+          player.setX(newPosition);
+        }
         return false;
       case 3:
-        player.setY(player.getY() + 1);
-        // non posso uscire dal perimetro della griglia, rifare il movimento
-        // non posso andare sopra ad un blocco, rifare il movimento
+        newPosition = player.getY() + 1;
+        if (isPositionAllowed(newPosition) && !isCollision(player.getX(), newPosition)) {
+          player.setY(newPosition);
+        }
         return false;
       default:
         return false;
@@ -100,11 +107,19 @@ public class Grid implements GridOperation {
     }
   }
 
-
-  public void startGame() {
+  public void startGame() throws InterruptedException {
     while (!isMoving()) {
       System.out.println(generateGrid());
+      Thread.sleep(1000);
     }
+  }
+
+  public boolean isPositionAllowed(int x) {
+    return (x <= gridSize && x > 0);
+  }
+
+  public boolean isCollision(int x, int y) {
+    return maybeElement(x, y).isPresent();
   }
 
 }
